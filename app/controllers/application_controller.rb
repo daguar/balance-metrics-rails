@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
 
   def index
     messages = Message.arel_table
-    @successful_messages = Message.where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("El saldo de su cuenta"))).count
+    @count_of_successful_messages = Message.where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("El saldo de su cuenta"))).count
+    @successful_messages_by_week = Message.where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("El saldo de su cuenta"))).group_by_week(:date_sent).count
   end
 end

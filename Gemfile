@@ -39,6 +39,7 @@ group :doc do
 end
 
 gem 'protected_attributes', '1.0.5'
+gem 'groupdate'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

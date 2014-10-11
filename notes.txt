@@ -1,0 +1,16 @@
+
+
+New request to Messages metrics page:
+  Get all Twilio messages since last message via API
+    For each:
+      TwilioDataLoader.load(:message, twilio_message)
+
+Bulk loader
+  Get all Twilio messages since last message via API
+    For each:
+      TwilioDataLoader.load(:message, twilio_message)
+
+
+
+TwilioDataLoader.load(:call, twilio_call)
+

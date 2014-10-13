@@ -6,6 +6,13 @@
 <% end %>
 </ul>
 
+<h3>Traffic sources (# of successful checks per source):</h3>
+<ul>
+<% @successful_messages_by_source.each do |a| %>
+  <li><%= "#{a[0]}: #{a[1]}" %></li>
+<% end %>
+</ul>
+
 <h3># of errors (ie, ""I'm sorry! We're having trouble...): <%= @count_of_error_messages %><h3>
 <h3>By week:</h3>
 <ul>

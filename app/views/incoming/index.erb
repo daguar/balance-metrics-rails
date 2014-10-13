@@ -1,0 +1,9 @@
+<h3>Inbound messages</h3>
+<a href="/">Back</a>
+
+<ul>
+<% @all_inbound_messages.each do |m| %>
+  <li><%= "#{m.date_sent.to_s} — #{m.from_number} — #{@phone_number_hash[m.to_number]} — #{m.body}" %></li>
+<% end %>
+</ul>
+

@@ -48,8 +48,8 @@ test:
   encoding: unicode
   database: balance-metrics-v2_test
   pool: 5
-  username: balance-metrics-v2
-  password:
+  username: <%= ENV['POSTGRES_USERNAME'] %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
 
 production:
   adapter: postgresql

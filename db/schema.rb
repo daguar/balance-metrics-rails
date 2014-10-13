@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20140908042217) do
   create_table "messages", force: true do |t|
     t.string   "sid"
     t.string   "body"
-    t.string   "to"
-    t.string   "from"
+    t.string   "to_number"
+    t.string   "from_number"
     t.string   "direction"
     t.datetime "date_sent"
     t.datetime "created_at"

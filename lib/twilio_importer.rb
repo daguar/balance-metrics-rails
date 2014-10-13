@@ -9,8 +9,8 @@ class TwilioImporter
       if Message.find_by_sid(m.sid) == nil
         Message.create(
           sid: m.sid,
-          to: m.to,
-          from: m.from,
+          to_number: m.to,
+          from_number: m.from,
           body: m.body,
           direction: m.direction,
           date_sent: Time.zone.parse(m.date_sent)

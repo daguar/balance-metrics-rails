@@ -18,5 +18,6 @@ class ApplicationController < ActionController::Base
     @error_messages_by_week = Message.where(messages[:body].matches("I'm really sorry! We're having trouble contacting the EBT system right now.%")).group_by_week(:date_sent).count
     @successful_messages_by_source = Message.where(messages[:body].matches("Hi! Your food stamp balance is %").or(messages[:body].matches("%El saldo de su cuenta%"))).group(:from_number).count
     @successful_messages_by_source = @successful_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
+    @number_of_unique_phone_numbers_with_one_successful_balance_check = Message.select(:to_number).where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("%El saldo de su cuenta%"))).uniq.count
   end
 end

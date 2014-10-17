@@ -15,6 +15,10 @@ Set the necessary environment variables using Twilio's production credentials:
 - TWILIO_BALANCE_PROD_SID
 - TWILIO_BALANCE_PROD_AUTH
 
+Set the necessary environment variables for [plotly](http://plot.ly/) credentials:
+
+- PLOTLY_USERNAME
+- PLOTLY_KEY
 
 Clone the repo, go into the directory, and install dependencies:
 

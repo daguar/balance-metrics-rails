@@ -1,10 +1,7 @@
-require File.expand_path('../../twilio_helper', __FILE__)
+require File.expand_path('../../twilio_importer', __FILE__)
 
-namespace :import do
-  desc 'Imports messages from Twilio'
-  task :messages do
-    client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
-    TwilioHelper
-    binding.pry
-  end
+desc 'Imports all messages from Twilio - used by heroku scheduler daily'
+task :import_messages => :environment do
+  #Imports from scratch each time - @dave should really fix this someday
+  TwilioImporter.new.load_messages!
 end

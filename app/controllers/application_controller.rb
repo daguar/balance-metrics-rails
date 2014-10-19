@@ -4,6 +4,13 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   def index
+    @successful_message_strings = [
+    'Hi! Your food stamp balance is%',
+    '%El saldo de su cuenta%',
+    'Hi! Your food and nutrition benefits balance is%']
+
+    @error_message_strings = ["I'm really sorry! We're having trouble contacting the EBT system right now.%"]
+
     client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
     @phone_number_hash = Hash.new
     client.account.incoming_phone_numbers.list.each do |number|
@@ -12,13 +19,15 @@ class ApplicationController < ActionController::Base
     end
 
     messages = Message.arel_table
-    @all_successful_messages = Message.where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("%El saldo de su cuenta%")))
+    @all_successful_messages = Message.where(messages[:body].matches_any(@successful_message_strings))
     @count_of_successful_messages = @all_successful_messages.count
-    @successful_messages_by_week = Message.where(messages[:body].matches("Hi! Your food stamp balance is%").or(messages[:body].matches("%El saldo de su cuenta%"))).group_by_week(:date_sent).count
-    @count_of_error_messages = Message.where(messages[:body].matches("I'm really sorry! We're having trouble contacting the EBT system right now.%")).count
-    @error_messages_by_week = Message.where(messages[:body].matches("I'm really sorry! We're having trouble contacting the EBT system right now.%")).group_by_week(:date_sent).count
-    @successful_messages_by_source = Message.where(messages[:body].matches("Hi! Your food stamp balance is %").or(messages[:body].matches("%El saldo de su cuenta%"))).group(:from_number).count
+    @successful_messages_by_week = @all_successful_messages.group_by_week(:date_sent).count
+    @successful_messages_by_source = @all_successful_messages.group(:from_number).count
     @successful_messages_by_source = @successful_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
+
+    @count_of_error_messages = Message.where(messages[:body].matches_any(@error_message_strings)).count
+    @error_messages_by_week = Message.where(messages[:body].matches_any(@error_message_strings)).group_by_week(:date_sent).count
+    
     @number_of_unique_phone_numbers_with_one_successful_balance_check = @all_successful_messages.select(:to_number).uniq.count
     
     # Checks

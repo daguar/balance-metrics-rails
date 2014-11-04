@@ -11,6 +11,13 @@ class ApplicationController < ActionController::Base
 
     @error_message_strings = ["I'm really sorry! We're having trouble contacting the EBT system right now.%"]
 
+    # Includes orry_try_again and card_number_not_found_message messages
+    @failure_message_strings = [
+    "Sorry! That number doesn't look right.%",
+    'Perdon, ese número de EBT no esta trabajando%',
+    "I'm sorry, that card number was not found.%",
+    'Lo siento, no se encontró el número de tarjeta%']
+
     client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
     @phone_number_hash = Hash.new
     client.account.incoming_phone_numbers.list.each do |number|
@@ -18,6 +25,7 @@ class ApplicationController < ActionController::Base
       @phone_number_hash[number.phone_number] = funnel_name
     end
 
+    # Successes
     messages = Message.arel_table
     @all_successful_messages = Message.where(messages[:body].matches_any(@successful_message_strings))
     @count_of_successful_messages = @all_successful_messages.count
@@ -25,6 +33,21 @@ class ApplicationController < ActionController::Base
     @successful_messages_by_source = @all_successful_messages.group(:from_number).count
     @successful_messages_by_source = @successful_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
 
+    # Failures
+    @all_failure_messages = Message.where(messages[:body].matches_any(@failure_message_strings))
+    @count_of_failure_messages = @all_failure_messages.count
+    @failure_messages_by_week = @all_failure_messages.group_by_week(:date_sent).count
+    @failure_messages_by_day = @all_failure_messages.group_by_day(:date_sent).count
+    @average_count_of_weekly_failures = @failure_messages_by_week.values.inject { |sum, e| sum + e } / @failure_messages_by_week.size
+
+    @count_of_failures_last_7_days = 0
+    @failure_messages_by_day.keys[-7..-1].each do | day |
+      @count_of_failures_last_7_days += @failure_messages_by_day[day]
+    end
+    @failure_messages_by_source = @all_failure_messages.group(:from_number).count
+    @failure_messages_by_source = @failure_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
+
+    # Errors
     @count_of_error_messages = Message.where(messages[:body].matches_any(@error_message_strings)).count
     @error_messages_by_week = Message.where(messages[:body].matches_any(@error_message_strings)).group_by_week(:date_sent).count
     

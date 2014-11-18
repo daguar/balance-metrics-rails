@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
     # Engagement
     users_checks = @all_successful_messages.group(:to_number).count
     users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+    @total_engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
 
   
     # By source
@@ -42,7 +43,7 @@ class ApplicationController < ActionController::Base
 
     @phone_number_hash.keys.each do |s|
       source_name = @phone_number_hash[s]
-      
+
       # checks
       checks = @all_successful_messages.select(:to_number).where(from_number: s).count
       if checks == 0

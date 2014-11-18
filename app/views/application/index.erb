@@ -1,6 +1,16 @@
 <h1>Balance Metrics</h1>
 
-<h3>By source:</h3>
+<h3>KPIs</h3>
+- Total successful checks: <b><%= @count_of_successful_messages %></b>
+<br>- Total unique users: <b><%= @number_of_unique_phone_numbers_with_one_successful_balance_check %></b>
+<br>- Engagement rate: <b><%= @total_engagement_rate.round(2) %></b>
+
+<h3>Definitions</h3>
+- Successful check = User who got 1 or more succesful balance response message
+<br>- Unique user = Number of unique phone numbers that had a successful check
+<br>- Engagement rate = % of unique users that had 2 or more successful checks
+
+<br><br>
 <table>
   <tr>
     <th>Source</th>
@@ -23,15 +33,6 @@
 <ul>
 <% @successful_messages_by_week.each_pair do |k,v| %>
   <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
-<% end %>
-</ul>
-
-<h3># of unique users with at least 1 successful balance check: <%= @number_of_unique_phone_numbers_with_one_successful_balance_check %></h3>
-
-<h3>Traffic sources (# of successful checks per source):</h3>
-<ul>
-<% @successful_messages_by_source.each do |a| %>
-  <li><%= "#{a[0]}: #{a[1]}" %></li>
 <% end %>
 </ul>
 

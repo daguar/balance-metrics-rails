@@ -36,6 +36,19 @@ class ApplicationController < ActionController::Base
       count = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
       @uniques_by_source[@phone_number_hash[s]] = count if count != 0
     end
+
+    # Engagement
+    users_checks = @all_successful_messages.group(:to_number).count
+    users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+
+    @engagement_rate_by_source = Hash.new
+    @engagement_rate_by_source['total'] = users_with_two_or_more_checks.to_f / users_checks.keys.count
+    @phone_number_hash.keys.each do |s|
+      users_checks = @all_successful_messages.where(from_number: s).group(:to_number).count
+      users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+      engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
+      @engagement_rate_by_source[@phone_number_hash[s]] = engagement_rate if !engagement_rate.nan?
+    end
     
     # Checks
     args = []

@@ -17,6 +17,13 @@
 <% end %>
 </ul>
 
+<h3>Engagement rate by source:</h3>
+<ul>
+<% @engagement_rate_by_source.sort_by { |k, v| -v}.each do |a| %>
+  <li><%= "#{a[0]}: #{a[1]}" %></li>
+<% end %>
+</ul>
+
 <h3>Traffic sources (# of successful checks per source):</h3>
 <ul>
 <% @successful_messages_by_source.each do |a| %>

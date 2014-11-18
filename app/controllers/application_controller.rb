@@ -27,8 +27,15 @@ class ApplicationController < ActionController::Base
 
     @count_of_error_messages = Message.where(messages[:body].matches_any(@error_message_strings)).count
     @error_messages_by_week = Message.where(messages[:body].matches_any(@error_message_strings)).group_by_week(:date_sent).count
-    
+
+    # Uniques
     @number_of_unique_phone_numbers_with_one_successful_balance_check = @all_successful_messages.select(:to_number).uniq.count
+
+    @uniques_by_source = Hash.new
+    @phone_number_hash.keys.each do |s|
+      count = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
+      @uniques_by_source[@phone_number_hash[s]] = count if count != 0
+    end
     
     # Checks
     args = []

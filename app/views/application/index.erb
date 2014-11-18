@@ -10,6 +10,13 @@
 
 <h3># of unique users with at least 1 successful balance check: <%= @number_of_unique_phone_numbers_with_one_successful_balance_check %></h3>
 
+<h3>Uniques by source:</h3>
+<ul>
+<% @uniques_by_source.sort_by { |k, v| -v}.each do |a| %>
+  <li><%= "#{a[0]}: #{a[1]}" %></li>
+<% end %>
+</ul>
+
 <h3>Traffic sources (# of successful checks per source):</h3>
 <ul>
 <% @successful_messages_by_source.each do |a| %>

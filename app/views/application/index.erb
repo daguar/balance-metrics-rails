@@ -1,31 +1,53 @@
 <h1>Balance Metrics</h1>
+<h3><%= @count_of_successful_messages %> successful checks</h3>
+<h3><%= @number_of_unique_phone_numbers_with_one_successful_balance_check %> unique users</h3>
 
-<h3># of successful balance checks: <%= @count_of_successful_messages %><h3>
-<h3>By week:</h3>
+<!-- <h3>Successes</h3>
+<b>By week:</b>
 <ul>
 <% @successful_messages_by_week.each_pair do |k,v| %>
   <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
 <% end %>
 </ul>
 
-<h3># of unique users with at least 1 successful balance check: <%= @number_of_unique_phone_numbers_with_one_successful_balance_check %></h3>
-
-<h3>Traffic sources (# of successful checks per source):</h3>
+<b>By source:</b>
 <ul>
 <% @successful_messages_by_source.each do |a| %>
   <li><%= "#{a[0]}: #{a[1]}" %></li>
 <% end %>
-</ul>
+</ul> -->
 
-<h3># of errors (ie, ""I'm sorry! We're having trouble...): <%= @count_of_error_messages %><h3>
-<h3>By week:</h3>
+<h3>Fails</h3>
+Total: <%= @count_of_failure_messages %>
+<br>Weekly average: <%= @average_count_of_weekly_failures %>
+<br>Total in last 7 days: <%= @count_of_failures_last_7_days %>
+<!-- 
+<br><b>By week:</b>
+<ul>
+<% @failure_messages_by_week.each_pair do |k,v| %>
+  <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
+<% end %>
+</ul>
+ -->
+<!-- <br><b>By source:</b>
+<ul>
+<% @failure_messages_by_source.each do |a| %>
+  <li><%= "#{a[0]}: #{a[1]}" %></li>
+<% end %>
+</ul>
+ -->
+<h3>Errors</h3>
+Error = "I'm sorry! We're having trouble..."
+<br>Total: <%= @count_of_error_messages %>
+
+<!-- <br><b>By week</b>
 <ul>
 <% @error_messages_by_week.each_pair do |k,v| %>
   <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
 <% end %>
-</ul>
-
-<h3>CHARTS!!<h3>
+</ul> -->
+<br>
+<br>
 <iframe width="800" height="600" frameborder="0" seamless="seamless" scrolling="no" src="<%= "#{@successful_messages_plot_url}" %>.embed?width=800&height=600"></iframe>
 <br>
 <br>

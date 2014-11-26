@@ -13,10 +13,10 @@ class TwilioImporter
           from_number: m.from,
           body: m.body,
           direction: m.direction,
-          date_sent: Time.zone.parse(m.date_sent)
+          date_sent: m.date_sent ? Time.zone.parse(m.date_sent) : '' # No sent date if the message fails to send
         )
+        puts "Processed #{index} of #{count} (#{m.sid})"
       end
-      puts "Processed #{index} of #{count} (#{m.sid})"
     end
   end
 end

@@ -50,8 +50,43 @@ class ApplicationController < ActionController::Base
     # Errors
     @count_of_error_messages = Message.where(messages[:body].matches_any(@error_message_strings)).count
     @error_messages_by_week = Message.where(messages[:body].matches_any(@error_message_strings)).group_by_week(:date_sent).count
-    
+
+    # Uniques
     @number_of_unique_phone_numbers_with_one_successful_balance_check = @all_successful_messages.select(:to_number).uniq.count
+
+    # Engagement
+    users_checks = @all_successful_messages.group(:to_number).count
+    users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+    @total_engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
+
+  
+    # By source
+    # @engagement_rate_by_source['total'] = users_with_two_or_more_checks.to_f / users_checks.keys.count
+    @metrics_by_source = Hash.new
+
+    @phone_number_hash.keys.each do |s|
+      source_name = @phone_number_hash[s]
+
+      # checks
+      checks = @all_successful_messages.select(:to_number).where(from_number: s).count
+      if checks == 0
+        next
+      end
+      @metrics_by_source[source_name] = Hash.new
+      @metrics_by_source[source_name]['checks'] = checks
+      
+
+      # Uniques
+      uniques = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
+      @metrics_by_source[source_name]['uniques'] = uniques
+
+      # Engagement
+      users_checks = @all_successful_messages.where(from_number: s).group(:to_number).count
+      users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+      engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
+      @metrics_by_source[source_name]['engagement'] = engagement_rate if !engagement_rate.nan?
+    end
+
     
     # Checks
     args = []

@@ -2,27 +2,44 @@
 <h3><%= @count_of_successful_messages %> successful checks</h3>
 <h3><%= @number_of_unique_phone_numbers_with_one_successful_balance_check %> unique users</h3>
 
-<!-- <h3>Successes</h3>
-<b>By week:</b>
+<h3>KPIs</h3>
+- Total successful checks: <b><%= @count_of_successful_messages %></b>
+<br>- Total unique users: <b><%= @number_of_unique_phone_numbers_with_one_successful_balance_check %></b>
+<br>- Engagement rate: <b><%= @total_engagement_rate.round(2) %></b>
+
+<h3>Definitions</h3>
+- Successful check = User who got 1 or more succesful balance response message
+<br>- Unique user = Number of unique phone numbers that had a successful check
+<br>- Engagement rate = % of unique users that had 2 or more successful checks
+
+<br><br>
+<table>
+  <tr>
+    <th>Source</th>
+    <th>Successful checks</th>
+    <th>Uniques</th>
+    <th>Engagement rate</th>
+  </tr>
+  <% @metrics_by_source.sort_by { |name, metrics| -metrics['uniques']}.each do |name, metrics| %>
+    <tr>
+      <td><%= "#{name}" %></td>
+      <td><%= "#{metrics['checks']}" %></td>
+      <td><%= "#{metrics['uniques']}" %></td>
+      <td><%= "#{metrics['engagement'].round(2)}" %></td>
+    </tr>
+  <% end %>
+</table>
+
+<h3># of successful balance checks: <%= @count_of_successful_messages %><h3>
+<h3>By week:</h3>
 <ul>
 <% @successful_messages_by_week.each_pair do |k,v| %>
   <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
 <% end %>
 </ul>
 
-<b>By source:</b>
-<ul>
-<% @successful_messages_by_source.each do |a| %>
-  <li><%= "#{a[0]}: #{a[1]}" %></li>
-<% end %>
-</ul> -->
-
-<h3>Fails</h3>
-Total: <%= @count_of_failure_messages %>
-<br>Weekly average: <%= @average_count_of_weekly_failures %>
-<br>Total in last 7 days: <%= @count_of_failures_last_7_days %>
-<!-- 
-<br><b>By week:</b>
+<h3># of errors (ie, ""I'm sorry! We're having trouble...): <%= @count_of_error_messages %><h3>
+<h3>By week:</h3>
 <ul>
 <% @failure_messages_by_week.each_pair do |k,v| %>
   <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>

@@ -7,6 +7,7 @@ BalanceMetricsV2::Application.routes.draw do
   root 'application#index'
   get 'internal' => 'internal#index'
   get 'internal/incoming' => 'incoming#index'
+  get 'internal/phone-numbers/:number' => 'internal#phone_number'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

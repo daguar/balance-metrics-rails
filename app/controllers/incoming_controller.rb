@@ -1,4 +1,6 @@
 class IncomingController < ApplicationController
+  http_basic_authenticate_with name: ENV['BALANCE_METRICS_USERNAME'], password: ENV['BALANCE_METRICS_PASSWORD']
+
   def index
     # client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
     # @phone_number_hash = Hash.new

@@ -13,7 +13,7 @@
     <% else %>
       <% clean_body = m.body %>
     <% end %>
-    <%= "#{m.from_number} — #{m.date_sent} — #{@phone_number_hash[m.to_number]} — #{clean_body}" %>
+    <a href="/internal/phone-numbers/<%= m.from_number.gsub("+","") %>"><%= m.from_number %></a> — <%= "#{m.date_sent} — #{@phone_number_hash[m.to_number]} — #{clean_body}" %>
   </li>
 <% end %>
 </ul>

@@ -20,6 +20,11 @@ Set the necessary environment variables for [plotly](http://plot.ly/) credential
 - PLOTLY_USERNAME
 - PLOTLY_KEY
 
+Lastly, set the environment variables for the internal-facing views:
+
+- BALANCE_METRICS_USERNAME
+- BALANCE_METRICS_PASSWORD
+
 Clone the repo, go into the directory, and install dependencies:
 
 `bundle install`

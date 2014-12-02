@@ -1,4 +1,20 @@
 <h3>Inbound messages</h3>
-<a href="/">Back</a>
+<a href="/internal">Back</a>
 
-<p>Shhh, it's a secret.</p>
+<p>
+  Note: '*' reflects a message where the only characters were digits/spaces (so, only EBT numbers or attempts) and are redacted for security
+</p>
+
+<ul>
+<% @all_inbound_messages.each do |m| %>
+  <li>
+    <% if /\D+/.match(m.body.gsub(" ", "").gsub("-", "").gsub("\r", "").gsub("\n", "")) == nil %>
+      <% clean_body = "*" %>
+    <% else %>
+      <% clean_body = m.body %>
+    <% end %>
+    <%= "#{m.from_number} — #{m.date_sent} — #{@phone_number_hash[m.to_number]} — #{clean_body}" %>
+  </li>
+<% end %>
+</ul>
+

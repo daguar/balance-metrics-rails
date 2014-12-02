@@ -5,7 +5,8 @@ BalanceMetricsV2::Application.routes.draw do
   # You can have the root of your site routed with "root"
   # root 'welcome#index'
   root 'application#index'
-  get 'incoming' => 'incoming#index'
+  get 'internal' => 'internal#index'
+  get 'internal/incoming' => 'incoming#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

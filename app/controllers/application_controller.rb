@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
   before_filter :set_global_variables
-
+  around_filter :profile if Rails.env == 'development'
   force_ssl if Rails.env == 'production'
 
   def set_global_variables
@@ -30,6 +30,21 @@ class ApplicationController < ActionController::Base
 
     @messages = Message.arel_table
     @all_successful_messages = Message.where(@messages[:body].matches_any(@successful_message_strings))
+  end
+
+  def profile
+    if params[:profile] && result = RubyProf.profile { yield }
+
+      out = StringIO.new
+      RubyProf::GraphHtmlPrinter.new(result).print out, :min_percent => 0
+      self.response_body = out.string
+      printer = RubyProf::MultiPrinter.new(result)
+      # render :text => out.string
+      # render :json => {'value' => monthly_active_users}
+
+    else
+      yield
+    end
   end
 
   def index
@@ -127,6 +142,7 @@ class ApplicationController < ActionController::Base
     all_days_with_successful_message = @all_successful_messages.select(:date_sent).map { |m| m.date_sent.to_date}.uniq.sort
     x = all_days_with_successful_message
     y = []
+    # This is bad and slowing everything down
     all_days_with_successful_message.each do |day|
       y << @all_successful_messages.select(:to_number).where(messages[:date_sent].lt(day+1)).uniq.count
     end

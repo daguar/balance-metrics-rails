@@ -31,6 +31,7 @@ gem 'twilio-ruby'
 
 group :development, :test do
   gem 'pry'
+  gem "ruby-prof"
 end
 
 group :doc do

@@ -2,23 +2,24 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
+  before_filter :set_global_variables
 
   force_ssl if Rails.env == 'production'
 
-  def index
+  def set_global_variables
     @successful_message_strings = [
-    'Hi! Your food stamp balance is%',
-    '%El saldo de su cuenta%',
-    'Hi! Your food and nutrition benefits balance is%']
-
-    @error_message_strings = ["I'm really sorry! We're having trouble contacting the EBT system right now.%"]
+      'Hi! Your food stamp balance is%',
+      '%El saldo de su cuenta%',
+      'Hi! Your food and nutrition benefits balance is%']
 
     # Includes orry_try_again and card_number_not_found_message messages
     @failure_message_strings = [
-    "Sorry! That number doesn't look right.%",
-    'Perdon, ese número de EBT no esta trabajando%',
-    "I'm sorry, that card number was not found.%",
-    'Lo siento, no se encontró el número de tarjeta%']
+      "Sorry! That number doesn't look right.%",
+      'Perdon, ese número de EBT no esta trabajando%',
+      "I'm sorry, that card number was not found.%",
+      'Lo siento, no se encontró el número de tarjeta%']
+
+    @error_message_strings = ["I'm really sorry! We're having trouble contacting the EBT system right now.%"]
 
     client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
     @phone_number_hash = Hash.new
@@ -27,6 +28,11 @@ class ApplicationController < ActionController::Base
       @phone_number_hash[number.phone_number] = funnel_name
     end
 
+    @messages = Message.arel_table
+    @all_successful_messages = Message.where(@messages[:body].matches_any(@successful_message_strings))
+  end
+
+  def index
     # Successes
     messages = Message.arel_table
     @all_successful_messages = Message.where(messages[:body].matches_any(@successful_message_strings))
@@ -61,7 +67,6 @@ class ApplicationController < ActionController::Base
     users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
     @total_engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
 
-  
     # By source
     # @engagement_rate_by_source['total'] = users_with_two_or_more_checks.to_f / users_checks.keys.count
     @metrics_by_source = Hash.new
@@ -143,5 +148,54 @@ class ApplicationController < ActionController::Base
 
     @uniques_plot_url = view_context.create_plot("plot", args, kwargs)
 
+  end
+
+  # Ducksboard routes
+  def mau
+    monthly_successful_checks = @all_successful_messages.where("date_sent >= ?", Time.now - 30.days)
+    monthly_active_users = monthly_successful_checks.select(:to_number).uniq.count
+    render :json => {'value' => monthly_active_users}
+  end
+
+  def monthly_checks
+    monthly_successful_checks = @all_successful_messages.where("date_sent >= ?", Time.now - 30.days)
+    render :json => {'value' => monthly_successful_checks.count}
+  end
+
+  def leaderboard
+    # Docs https://dev.ducksboard.com/apidoc/slot-kinds/#leaderboards
+    # {"name": "sf_food_bank", "values": [checks, users, engagement]},
+    @metrics_by_source = Hash.new
+    @phone_number_hash.keys.each do |s|
+      source_name = @phone_number_hash[s]
+
+      # Checks
+      checks = @all_successful_messages.select(:to_number).where(from_number: s).count
+      if checks == 0
+        next
+      end
+      @metrics_by_source[source_name] = Hash.new
+      @metrics_by_source[source_name]['checks'] = checks
+      
+      # Uniques
+      uniques = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
+      @metrics_by_source[source_name]['uniques'] = uniques
+
+      # Engagement
+      users_checks = @all_successful_messages.where(from_number: s).group(:to_number).count
+      users_with_two_or_more_checks = users_checks.count { |k, v| v > 1 }
+      engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
+      @metrics_by_source[source_name]['engagement'] = engagement_rate if !engagement_rate.nan?
+    end
+    
+    @board = []
+    sorted_metrics_by_source = @metrics_by_source.sort_by { |name, metrics| -metrics['checks']}
+    sorted_metrics_by_source.each do |name, metrics|
+      @board << {
+        "name" => name,
+        "values" => [metrics['checks'], metrics['uniques'], metrics['engagement']]
+      }
+    end
+    render :json => {'value' => {"board" => @board}}
   end
 end

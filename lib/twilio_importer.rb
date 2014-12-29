@@ -2,10 +2,13 @@ class TwilioImporter
   def load_messages!
     puts "IMPORTING TWILIO MESSAGES"
     client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
-    messages = client.account.messages.list
+    last_message_date = Message.last.date_sent
+    date_to_pull = last_message_date - 3.days
+    formatted_date = date_to_pull.strftime("%Y-%m-%d")
+    messages = client.account.messages.list("DateSent>" => formatted_date)
     total = messages.total
     count = 0
-    while messages.next_page do
+    while messages do
       puts "Begin processing messages"
       messages.each do |m|
         if Message.find_by_sid(m.sid) == nil
@@ -21,7 +24,7 @@ class TwilioImporter
         count += 1
         puts "Processed msg #{count} of #{total}: #{m.sid}"
       end
-      messages = messages.next_page
+      messages = messages.try(:next_page) # returns [] for last page
     end
   end
 end

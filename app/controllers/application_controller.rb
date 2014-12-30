@@ -139,15 +139,29 @@ class ApplicationController < ActionController::Base
     @successful_messages_plot_url = view_context.create_plot("plot", args, kwargs)
 
     # Uniques
-    all_days_with_successful_message = @all_successful_messages.select(:date_sent).map { |m| m.date_sent.to_date}.uniq.sort
-    x = all_days_with_successful_message
-    y = []
-    # This is bad and slowing everything down
-    all_days_with_successful_message.each do |day|
-      y << @all_successful_messages.select(:to_number).where(messages[:date_sent].lt(day+1)).uniq.count
-    end
+    sql = "WITH rankings AS (
+            SELECT m.date_sent::date,
+                  ROW_NUMBER() OVER(PARTITION BY m.to_number 
+                                         ORDER BY m.date_sent ASC) AS rk
+              FROM MESSAGES m
+              WHERE m.body SIMILAR TO '(Hi! Your food stamp balance is%|%El saldo de su cuenta%|Hi! Your food and nutrition benefits balance is%)'),
+          
+          new_users AS (
+            SELECT r.*
+              FROM rankings r
+              WHERE r.rk = 1)
 
-    args = [x, y]
+          SELECT n.date_sent, SUM(n.rk)
+            FROM new_users n
+            GROUP BY n.date_sent
+            ORDER BY n.date_sent ASC;"
+
+    new_user_counts_by_day = ActiveRecord::Base.connection.execute(sql)
+    days = new_user_counts_by_day.values.map { |v| v[0]}
+    sum = 0
+    cumulative_users_daily = new_user_counts_by_day.values.map { |v| sum += v[1].to_i}
+
+    args = [days, cumulative_users_daily]
     kwargs={
       "filename"=> "Balance Metrics - Uniques",
       "fileopt"=> "overwrite",

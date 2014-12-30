@@ -7,6 +7,6 @@ task :purge_bad_messages => :environment do
   twilio_phone_numbers = client.account.incoming_phone_numbers.list.map { |n| n.phone_number }
   bad_messages = Message.where("to_number IN (?) AND from_number IN (?)", twilio_phone_numbers, twilio_phone_numbers)
   puts "Found #{bad_messages.count} bad messages. Begin destruction..."
-  destroyed = bad_messages.destroy_all
-  puts "Successfully purged #{destroyed.length} Twilio-to-Twilio messages. Enjoy!"
+  deleted_count = bad_messages.delete_all
+  puts "Successfully purged #{deleted_count} Twilio-to-Twilio messages. Enjoy!"
 end

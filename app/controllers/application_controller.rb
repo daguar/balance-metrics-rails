@@ -41,6 +41,7 @@ class ApplicationController < ActionController::Base
     @successful_messages_by_source = @all_successful_messages.group(:from_number).count
     @successful_messages_by_source = @successful_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
 
+=begin
     # Failures
     @all_failure_messages = Message.where(messages[:body].matches_any(@failure_message_strings))
     @count_of_failure_messages = @all_failure_messages.count
@@ -58,6 +59,7 @@ class ApplicationController < ActionController::Base
     # Errors
     @count_of_error_messages = Message.where(messages[:body].matches_any(@error_message_strings)).count
     @error_messages_by_week = Message.where(messages[:body].matches_any(@error_message_strings)).group_by_week(:date_sent).count
+=end
 
     # Uniques
     @number_of_unique_phone_numbers_with_one_successful_balance_check = @all_successful_messages.select(:to_number).uniq.count

@@ -38,30 +38,13 @@
 <% end %>
 </ul>
 
-<h3># of errors (ie, ""I'm sorry! We're having trouble...): <%= @count_of_error_messages %><h3>
-<h3>By week:</h3>
 <ul>
-<% @failure_messages_by_week.each_pair do |k,v| %>
-  <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
-<% end %>
 </ul>
  -->
 <!-- <br><b>By source:</b>
 <ul>
-<% @failure_messages_by_source.each do |a| %>
-  <li><%= "#{a[0]}: #{a[1]}" %></li>
-<% end %>
 </ul>
  -->
-<h3>Errors</h3>
-Error = "I'm sorry! We're having trouble..."
-<br>Total: <%= @count_of_error_messages %>
-
-<!-- <br><b>By week</b>
-<ul>
-<% @error_messages_by_week.each_pair do |k,v| %>
-  <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
-<% end %>
 </ul> -->
 <br>
 <br>

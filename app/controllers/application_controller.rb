@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
     messages = Message.arel_table
     @all_successful_messages = Message.where(messages[:body].matches_any(@successful_message_strings))
     @count_of_successful_messages = @all_successful_messages.count
-    @successful_messages_by_week = @all_successful_messages.group_by_week(:date_sent).count
+    #@successful_messages_by_week = @all_successful_messages.group_by_week(:date_sent).count
     @successful_messages_by_source = @all_successful_messages.group(:from_number).count
     @successful_messages_by_source = @successful_messages_by_source.map { |k,v| [@phone_number_hash[k],v] }.sort { |a,b| b[1] <=> a[1] }
 
@@ -83,7 +83,7 @@ class ApplicationController < ActionController::Base
       end
       @metrics_by_source[source_name] = Hash.new
       @metrics_by_source[source_name]['checks'] = checks
-      
+
 
       # Uniques
       uniques = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
@@ -96,8 +96,9 @@ class ApplicationController < ActionController::Base
       @metrics_by_source[source_name]['engagement'] = engagement_rate if !engagement_rate.nan?
     end
 
-    
+
     # Checks
+=begin
     args = []
     @phone_number_hash.keys.each do |source_number|
       successful_messages_for_source = @all_successful_messages.where(messages[:from_number].eq(source_number))
@@ -149,7 +150,7 @@ class ApplicationController < ActionController::Base
       }
 
     @uniques_plot_url = view_context.create_plot("plot", args, kwargs)
-
+=end
   end
 
   # Ducksboard routes
@@ -178,7 +179,7 @@ class ApplicationController < ActionController::Base
       end
       @metrics_by_source[source_name] = Hash.new
       @metrics_by_source[source_name]['checks'] = checks
-      
+
       # Uniques
       uniques = @all_successful_messages.select(:to_number).where(from_number: s).uniq.count
       @metrics_by_source[source_name]['uniques'] = uniques
@@ -189,7 +190,7 @@ class ApplicationController < ActionController::Base
       engagement_rate = users_with_two_or_more_checks.to_f / users_checks.keys.count
       @metrics_by_source[source_name]['engagement'] = engagement_rate if !engagement_rate.nan?
     end
-    
+
     @board = []
     sorted_metrics_by_source = @metrics_by_source.sort_by { |name, metrics| -metrics['checks']}
     sorted_metrics_by_source.each do |name, metrics|

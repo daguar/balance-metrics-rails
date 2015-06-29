@@ -10,6 +10,6 @@ class IncomingController < ApplicationController
       @phone_number_hash[number.phone_number] = funnel_name
     end
 
-    @all_inbound_messages = Message.where("direction = ?", "inbound").order("date_sent ASC")
+    @all_inbound_messages = Message.where("direction = ?", "inbound").order("date_sent ASC").paginate(:page => params[:page], :per_page => 200)
   end
 end

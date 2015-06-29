@@ -40,6 +40,7 @@ end
 
 gem 'protected_attributes', '1.0.5'
 gem 'groupdate'
+gem 'will_paginate'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

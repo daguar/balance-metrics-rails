@@ -5,6 +5,8 @@
   Note: '*' reflects a message where the only characters were digits/spaces (so, only EBT numbers or attempts) and are redacted for security
 </p>
 
+<%= will_paginate @all_inbound_messages %>
+
 <ul>
 <% @all_inbound_messages.each do |m| %>
   <li>

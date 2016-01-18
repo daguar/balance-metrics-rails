@@ -21,12 +21,7 @@ class ApplicationController < ActionController::Base
 
     @error_message_strings = ["I'm really sorry! We're having trouble contacting the EBT system right now.%"]
 
-    client = Twilio::REST::Client.new(ENV['TWILIO_BALANCE_PROD_SID'], ENV['TWILIO_BALANCE_PROD_AUTH'])
-    @phone_number_hash = Hash.new
-    client.account.incoming_phone_numbers.list.each do |number|
-      funnel_name = number.friendly_name
-      @phone_number_hash[number.phone_number] = funnel_name
-    end
+    @phone_number_hash = TwilioService.get_phone_number_hash
 
     @messages = Message.arel_table
     @all_successful_messages = Message.where(@messages[:body].matches_any(@successful_message_strings))

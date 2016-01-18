@@ -31,11 +31,7 @@
 </table>
 
 <h3># of successful balance checks: <%= @count_of_successful_messages %><h3>
-<h3>By week:</h3>
 <ul>
-<% @successful_messages_by_week.each_pair do |k,v| %>
-  <li><%= "#{k.strftime("%b %d")}: #{v}" %></li>
-<% end %>
 </ul>
 
 <ul>
@@ -48,7 +44,4 @@
 </ul> -->
 <br>
 <br>
-<iframe width="800" height="600" frameborder="0" seamless="seamless" scrolling="no" src="<%= "#{@successful_messages_plot_url}" %>.embed?width=800&height=600"></iframe>
 <br>
-<br>
-<iframe width="800" height="600" frameborder="0" seamless="seamless" scrolling="no" src="<%= "#{@uniques_plot_url}" %>.embed?width=800&height=600"></iframe>
